@@ -21,25 +21,51 @@ def binary_peak_finder(list):
                 print("Not found")
                 break
 
-def peak_finder(Matrix, i, j):
+def peak_finder(Matrix, i, j):  # algorithm for odd matrix (like 5x5,7x7)
     half_colomn_cord = j // 2
-    list = []
+
+    ################ looking for a 2D peak in a colomn and in a row ##################
+
+    list = []  # colomn of half_colomn_cord
     for k in range(i):
         list.append(Matrix[k][half_colomn_cord])
 
     global_max_j = max(list)
-    i_index = list.index(global_max_j)
+    i_index_of_global_max_j = list.index(global_max_j)  # index of global_max_j compared to rows.
 
     list.clear()
     for k in range(j):
-        list.append(Matrix[i_index][k])
+        list.append(Matrix[i_index_of_global_max_j][k])  # list of i's row
 
-    return binary_peak_finder(list)
+    possible_2d_peak = binary_peak_finder(list)
+    ################ looking for a 2D peak in a colomn and in a row ##################
 
+    if(half_colomn_cord != 1):
+        if (list.index(global_max_j) > list.index(possible_2d_peak)):
+            # range_j = j - (j - list.index(possible_2d_peak) + 1)  - for even matrix
+            range_j = j - (list.index(possible_2d_peak) + 1)
+            new_Matrix = [[0 for x in range(range_j)] for y in range(i)]
+            for l in range(i):
+                for m in range(range_j):
+                    new_Matrix[l][m] = Matrix[l][m]
+            return peak_finder(new_Matrix, i, range_j)
+
+        elif (list.index(global_max_j) < list.index(possible_2d_peak)):
+            # range_j = j - (list.index(possible_2d_peak) + 1) - for even matrix
+            range_j = j - (list.index(global_max_j) + 1)
+            new_Matrix = [[0 for x in range(range_j)] for y in range(i)]
+            for l in range(i):
+                for m in range(range_j):
+                    new_Matrix[l][m] = Matrix[l][list.index(binary_peak_finder(list)) + m]
+            return peak_finder(new_Matrix, i, range_j)
+        else:
+            return possible_2d_peak
+    else:
+        return possible_2d_peak
 
 
 def main():
-    i, j = 5, 5
+    i, j = 7, 7  # algorithm works for an odd matrix, otherwise: change choose conditions in '#' in 'if else' clause
     Matrix = [[0 for x in range(i)] for y in range(j)]
 
     for l in range(i):
@@ -49,8 +75,7 @@ def main():
     for value in range(i):
         print(Matrix[value])
 
-    print("2D peak: ", peak_finder(Matrix, i, j))
+    matrix_size = "({0}x{1})".format(i,j)
+    print("2D peak of odd matrix {0}: {1}".format(matrix_size, peak_finder(Matrix, i, j)))
 
 main()
-
-## ДОПИСАТЬ
